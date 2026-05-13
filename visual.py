@@ -136,9 +136,9 @@ print("Objects stored:", len(object_embeddings))
 
 def search_text(query):
 
-  
+    # -----------------------------
     # TEXT EMBEDDING
-   
+    # -----------------------------
     inputs = processor(
         text=[query],
         return_tensors="pt",
@@ -152,11 +152,42 @@ def search_text(query):
             attention_mask=inputs["attention_mask"]
         )
 
-    query_embedding = np.array(text_features[0])
+    query_embedding = np.array(
+        text_features[0]
+    )
 
     query_embedding = query_embedding.reshape(-1)
 
-    query_embedding = normalize(query_embedding)
+    query_embedding = normalize(
+        query_embedding
+    )
+
+    # -----------------------------
+    # SIMILARITY SEARCH
+    # -----------------------------
+    scores = []
+
+    for i, emb in enumerate(object_embeddings):
+
+        emb = emb.reshape(-1)
+
+        score = float(
+            np.dot(query_embedding, emb)
+        )
+
+        scores.append(
+            (object_images[i], score)
+        )
+
+    # -----------------------------
+    # SORT RESULTS
+    # -----------------------------
+    scores.sort(
+        key=lambda x: x[1],
+        reverse=True
+    )
+
+    return scores[:5]
 
 # IMAGE SEARCH FUNCTION
 
