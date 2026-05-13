@@ -44,7 +44,8 @@ def get_image_embedding(image):
             pixel_values=inputs["pixel_values"]
         )
 
-    return features.detach().cpu().numpy()[0]
+    features = features[0]
+    return features.cpu().numpy()
 
 # EXTRACT FRAMES
 
