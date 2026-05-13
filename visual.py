@@ -171,6 +171,7 @@ def search_image(query_image):
     query_embedding = get_image_embedding(
         query_image
     )
+    query_embedding = query_embedding.reshape(-1)
 
     query_embedding = normalize(
         query_embedding
@@ -181,6 +182,7 @@ def search_image(query_image):
     scores = []
 
     for i, emb in enumerate(object_embeddings):
+        emb = emb.reshape(-1)
 
         score = float(
             np.dot(query_embedding, emb)
