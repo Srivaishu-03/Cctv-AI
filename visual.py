@@ -6,9 +6,8 @@ from PIL import Image
 from ultralytics import YOLO
 from transformers import CLIPProcessor, CLIPModel
 
-# -----------------------------
-# LOAD MODELS
-# -----------------------------
+#LOAD MODELS
+
 print("Loading models...")
 
 yolo_model = YOLO("yolov8n.pt")
@@ -23,16 +22,15 @@ processor = CLIPProcessor.from_pretrained(
 
 clip_model.eval()
 
-# -----------------------------
+
 # NORMALIZE
-# -----------------------------
+
 def normalize(x):
 
     return x / np.linalg.norm(x)
 
-# -----------------------------
 # IMAGE EMBEDDING
-# -----------------------------
+
 def get_image_embedding(image):
 
     inputs = processor(
@@ -48,11 +46,9 @@ def get_image_embedding(image):
 
     return features.cpu().numpy()[0]
 
-# -----------------------------
 # EXTRACT FRAMES
-# -----------------------------
-video_path = "video.mp4"
 
+video_path = "video.mp4"
 frame_folder = "frames"
 
 os.makedirs(frame_folder, exist_ok=True)
@@ -86,9 +82,9 @@ cap.release()
 
 print("Frames extracted!")
 
-# =====================================================
+
 # OBJECT DATABASE
-# =====================================================
+
 print("Creating object database...")
 
 object_embeddings = []
@@ -138,14 +134,14 @@ for frame_path in saved_frames:
 
 print("Objects stored:", len(object_embeddings))
 
-# =====================================================
+
 # TEXT SEARCH
-# =====================================================
+
 def search_text(query):
 
-    # -----------------------------
+  
     # TEXT EMBEDDING
-    # -----------------------------
+   
     inputs = processor(
         text=[query],
         return_tensors="pt",
@@ -162,15 +158,15 @@ def search_text(query):
     query_embedding = text_features.cpu().numpy()[0]
 
     query_embedding = normalize(query_embedding)
-# =====================================================
+
 # IMAGE SEARCH FUNCTION
-# =====================================================
+
 
 def search_image(query_image):
 
-    # -----------------------------
+
     # QUERY IMAGE EMBEDDING
-    # -----------------------------
+  
     query_embedding = get_image_embedding(
         query_image
     )
@@ -179,9 +175,8 @@ def search_image(query_image):
         query_embedding
     )
 
-    # -----------------------------
     # SIMILARITY SEARCH
-    # -----------------------------
+   
     scores = []
 
     for i, emb in enumerate(object_embeddings):

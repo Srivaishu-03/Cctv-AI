@@ -7,17 +7,15 @@ st.write(
     "Search CCTV using text or image"
 )
 
-# -----------------------------
 # SEARCH MODE
-# -----------------------------
+
 mode = st.radio(
     "Select Search Mode",
     ["Text", "Image"]
 )
 
-# =====================================================
 # TEXT SEARCH
-# =====================================================
+
 if mode == "Text":
 
     query = st.text_input(
@@ -37,9 +35,8 @@ if mode == "Text":
                 caption=f"Score: {round(score, 2)}"
             )
 
-# =====================================================
 # IMAGE SEARCH
-# =====================================================
+
 elif mode == "Image":
 
     image_file = st.file_uploader(
