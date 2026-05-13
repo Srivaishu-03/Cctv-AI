@@ -12,13 +12,9 @@ print("Loading models...")
 
 yolo_model = YOLO("yolov8n.pt")
 
-clip_model = CLIPModel.from_pretrained(
-    "openai/clip-vit-base-patch32"
-)
+clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
 
-processor = CLIPProcessor.from_pretrained(
-    "openai/clip-vit-base-patch32"
-)
+processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
 
 clip_model.eval()
 
@@ -156,7 +152,9 @@ def search_text(query):
             attention_mask=inputs["attention_mask"]
         )
 
-    query_embedding = text_features.cpu().numpy()[0]
+    query_embedding = np.array(text_features[0])
+
+    query_embedding = query_embedding.reshape(-1)
 
     query_embedding = normalize(query_embedding)
 
@@ -168,14 +166,10 @@ def search_image(query_image):
 
     # QUERY IMAGE EMBEDDING
   
-    query_embedding = get_image_embedding(
-        query_image
-    )
+    query_embedding = get_image_embedding(query_image)
     query_embedding = query_embedding.reshape(-1)
 
-    query_embedding = normalize(
-        query_embedding
-    )
+    query_embedding = normalize(query_embedding)
 
     # SIMILARITY SEARCH
    
