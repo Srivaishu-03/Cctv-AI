@@ -1,0 +1,21 @@
+[project]
+name = "cctv-ai-search"
+version = "0.1.0"
+description = "\"Intelligent CCTV surveillance and semantic object search using computer vision and deep learning\""
+authors = [
+    {name = "Vaishnavi"}
+]
+requires-python = ">=3.10"
+dependencies = [
+    numpy==2.4.4
+    opencv_python==4.13.0.92
+    opencv_python_headless==4.13.0.92
+    Pillow==12.2.0
+    streamlit==1.57.0
+    torch==2.11.0
+    transformers==4.41.0
+    ultralytics==8.4.49
+]
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
