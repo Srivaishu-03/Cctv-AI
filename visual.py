@@ -22,6 +22,7 @@ clip_model.eval()
 # NORMALIZE
 
 def normalize(x):
+    x = np.array(x)
 
     return x / np.linalg.norm(x)
 
