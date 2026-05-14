@@ -158,11 +158,8 @@ def search_text(query):
         text_features[0]
     )
 
-    query_embedding = query_embedding.reshape(-1)
-
-    query_embedding = normalize(
-        query_embedding
-    )
+    query_embedding = text_features.detach().cpu().numpy().reshape(-1).astype(np.float32)
+    query_embedding = normalize(query_embedding)
 
     # -----------------------------
     # SIMILARITY SEARCH
@@ -173,9 +170,10 @@ def search_text(query):
 
         emb = emb.reshape(-1)
 
-        score = float(
-            np.dot(query_embedding, emb)
-        )
+        score = np.dot(
+            query_embedding.astype(np.float32),
+            emb.astype(np.float32)
+)
 
         scores.append(
             (object_images[i], score)
