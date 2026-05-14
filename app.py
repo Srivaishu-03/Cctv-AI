@@ -1,5 +1,6 @@
 import streamlit as st
 from visual import search_text, search_image
+from agent import ai_agent
 
 st.title("🔍 CCTV Missing Person Search")
 
@@ -21,19 +22,23 @@ if mode == "Text":
     query = st.text_input(
         "Enter text query"
     )
-
+    
     if st.button("Search"):
 
-        results = search_text(query)
+        results = ai_agent(query)
 
-        st.success("Top Matches")
+        if len(results) == 0:
 
-        for image, score in results:
+            st.warning("No matching objects found")
 
-            st.image(
-                image,
-                caption=f"Score: {round(score, 2)}"
-            )
+        else:
+
+            st.success("Top Matches")
+
+            for image, score in results:
+
+                st.image(image,
+                       caption=f"Score: {round(score, 2)}")
 
 # IMAGE SEARCH
 

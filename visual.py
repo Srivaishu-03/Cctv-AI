@@ -137,6 +137,19 @@ print("Objects stored:", len(object_embeddings))
 
 def search_text(query):
 
+    valid_queries = [
+    "person",
+    "car",
+    "bus",
+    "truck",
+    "bike",
+    "motorcycle",
+    "bicycle"
+]
+
+    if query.lower() not in valid_queries:
+        return []
+
     # -----------------------------
     # TEXT EMBEDDING
     # -----------------------------
@@ -180,8 +193,12 @@ def search_text(query):
 
         score = float(np.dot(q, e))
 
-        scores.append((object_images[i], score))
-    
+        if score > 0.15:
+            scores.append((object_images[i], score))
+
+        if len(scores) == 0:
+            return []
+        
     scores.sort(
         key=lambda x: x[1],
         reverse=True
@@ -213,9 +230,11 @@ def search_image(query_image):
             np.dot(query_embedding, emb)
         )
 
-        scores.append(
-            (object_images[i], score)
-        )
+        if score > 0.15:
+            scores.append((object_images[i], score))
+
+        if len(scores) == 0:
+            return []
 
     scores.sort(
         key=lambda x: x[1],
@@ -223,5 +242,6 @@ def search_image(query_image):
     )
 
     return scores[:5]
+
 
   
