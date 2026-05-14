@@ -20,12 +20,11 @@ clip_model.eval()
 
 
 # NORMALIZE
+
 def normalize(x):
-    x = np.array(x, dtype=np.float32).reshape(-1)
-    norm = np.linalg.norm(x)
-    if norm == 0:
-        return x
-    return x / norm
+    x = np.array(x)
+
+    return x / np.linalg.norm(x)
 
 # IMAGE EMBEDDING
 
@@ -154,11 +153,10 @@ def search_text(query):
             attention_mask=inputs["attention_mask"]
         )
 
-    query_embedding = np.array(
-        text_features[0]
-    )
+    query_embedding = text_features[0].cpu().numpy()
 
-    query_embedding = text_features.detach().cpu().numpy().reshape(-1).astype(np.float32)
+    query_embedding = np.array(query_embedding).reshape(-1)
+
     query_embedding = normalize(query_embedding)
 
     # -----------------------------
@@ -168,20 +166,22 @@ def search_text(query):
 
     for i, emb in enumerate(object_embeddings):
 
-        emb = emb.reshape(-1)
+        emb = np.array(emb).reshape(-1)
 
-        score = np.dot(
-            query_embedding.astype(np.float32),
-            emb.astype(np.float32)
-)
-
-        scores.append(
-            (object_images[i], score)
+    # MATCH VECTOR SIZE
+        min_len = min(
+            len(query_embedding),
+            len(emb)
         )
 
-    # -----------------------------
-    # SORT RESULTS
-    # -----------------------------
+        q = query_embedding[:min_len]
+
+        e = emb[:min_len]
+
+        score = float(np.dot(q, e))
+
+        scores.append((object_images[i], score))
+    
     scores.sort(
         key=lambda x: x[1],
         reverse=True
