@@ -20,11 +20,12 @@ clip_model.eval()
 
 
 # NORMALIZE
-
 def normalize(x):
-    x = np.array(x)
-
-    return x / np.linalg.norm(x)
+    x = np.array(x, dtype=np.float32).reshape(-1)
+    norm = np.linalg.norm(x)
+    if norm == 0:
+        return x
+    return x / norm
 
 # IMAGE EMBEDDING
 
