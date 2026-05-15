@@ -139,6 +139,7 @@ def search_text(query):
 
     valid_queries = [
     "person",
+    "helmet"
     "car",
     "bus",
     "truck",

@@ -15,6 +15,8 @@ def ai_agent(query):
 
     elif "truck" in query:
         return search_text("truck")
-
+    
+    elif "helmet" in query:
+        return search_text("helmet")
     else:
         return search_text(query)
