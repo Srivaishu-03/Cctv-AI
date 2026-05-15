@@ -1,6 +1,5 @@
 import streamlit as st
 from visual import search_text, search_image
-from agent import ai_agent
 
 st.title("🔍 CCTV Missing Person Search")
 
@@ -25,7 +24,7 @@ if mode == "Text":
     
     if st.button("Search"):
 
-        results = ai_agent(query)
+        results = search_text(query)
 
         if len(results) == 0:
 
