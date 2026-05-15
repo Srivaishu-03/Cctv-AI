@@ -139,7 +139,7 @@ def search_text(query):
 
     valid_queries = [
     "person",
-    "helmet"
+    "helmet",
     "car",
     "bus",
     "truck",
@@ -197,8 +197,8 @@ def search_text(query):
         if score > 0.15:
             scores.append((object_images[i], score))
 
-        if len(scores) == 0:
-            return []
+    if len(scores) == 0:
+        return []
         
     scores.sort(
         key=lambda x: x[1],
@@ -234,8 +234,8 @@ def search_image(query_image):
         if score > 0.15:
             scores.append((object_images[i], score))
 
-        if len(scores) == 0:
-            return []
+    if len(scores) == 0:
+        return []
 
     scores.sort(
         key=lambda x: x[1],
