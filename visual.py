@@ -151,9 +151,9 @@ def search_text(query):
     if query.lower() not in valid_queries:
         return []
 
-    # -----------------------------
+
     # TEXT EMBEDDING
-    # -----------------------------
+
     inputs = processor(
         text=[query],
         return_tensors="pt",
@@ -173,9 +173,9 @@ def search_text(query):
 
     query_embedding = normalize(query_embedding)
 
-    # -----------------------------
+    
     # SIMILARITY SEARCH
-    # -----------------------------
+    
     scores = []
 
     for i, emb in enumerate(object_embeddings):
