@@ -1,4 +1,0 @@
-Multimodal CCTV Search System using CLIP Transformer
-Project Overview
-The Multimodal CCTV Search System using CLIP Transformer is an AI-powered surveillance application developed to simplify CCTV footage analysis and reduce manual monitoring effort. The system allows users to search CCTV footage using both text queries and image queries. It combines Computer Vision and Multimodal AI techniques to retrieve visually similar objects or persons from CCTV video frames.
-The project uses YOLOv8 for object detection and the CLIP Transformer model for generating semantic embeddings from both text and images. Cosine similarity is used to compare embeddings and retrieve the most relevant matches.
