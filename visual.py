@@ -18,6 +18,8 @@ processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
 
 clip_model.eval()
 
+yolo_class_names = yolo_model.names
+
 
 # NORMALIZE
 
@@ -87,6 +89,8 @@ print("Creating object database...")
 
 object_embeddings = []
 object_images = []
+object_classes = []   # NEW — tracks what YOLO thinks each object actually is
+
 
 for frame_path in saved_frames:
 
@@ -103,6 +107,9 @@ for frame_path in saved_frames:
         # OPTIONAL FILTER
         if confidence < 0.5:
             continue
+
+         # YOLO's own label for this object, e.g. "person", "truck", "car"
+        class_name = yolo_class_names[cls_id]
 
         # Bounding box
         x1, y1, x2, y2 = map(
@@ -129,6 +136,8 @@ for frame_path in saved_frames:
         object_embeddings.append(embedding)
 
         object_images.append(crop_pil)
+        # Keep track of YOLO's class label for this object (aligns with embeddings/images)
+        object_classes.append(class_name.lower())
 
 print("Objects stored:", len(object_embeddings))
 
@@ -145,14 +154,27 @@ def search_text(query):
     "truck",
     "bike",
     "motorcycle",
-    "bicycle"
+    "bicycle",
+    "van"
 ]
+    query_lower = query.lower()
+
 
     if query.lower() not in valid_queries:
         return []
+    
+    # step 1 Filter candidates using YOLO's own class label.
+    # This guarantees a "person" search can never return a truck, etc.,
+    # no matter what CLIP's similarity score says.
+    candidate_indices = [
+        i for i, cls in enumerate(object_classes) if cls == query_lower
+    ]
+ 
+    if len(candidate_indices) == 0:
+        return []
 
 
-    # TEXT EMBEDDING
+    # step 2 TEXT EMBEDDING
 
     inputs = processor(
         text=[query],
@@ -174,7 +196,7 @@ def search_text(query):
     query_embedding = normalize(query_embedding)
 
     
-    # SIMILARITY SEARCH
+    # Step 3 SIMILARITY SEARCH
     
     scores = []
 
@@ -222,25 +244,53 @@ def search_image(query_image):
 
     # SIMILARITY SEARCH
    
+    # Use YOLO on the query image to get a class label and filter candidates.
+    # This prevents unrelated object types from being returned for an arbitrary
+    # query image (e.g., returning cars for a person photo).
+    img_bgr = cv2.cvtColor(np.array(query_image), cv2.COLOR_RGB2BGR)
+
+    yres = yolo_model(img_bgr)[0]
+
+    detected_class = None
+    max_conf = 0.0
+
+    for box in yres.boxes:
+
+        conf = float(box.conf[0])
+        cls_id = int(box.cls[0])
+
+        if conf > max_conf:
+            max_conf = conf
+            detected_class = yolo_class_names[cls_id].lower()
+
+    # Require a reasonably confident detection; otherwise return no results
+    # to avoid returning unrelated objects.
+    if detected_class is None or max_conf < 0.35:
+        return []
+
+    # Filter candidates to only those YOLO labeled with the same class
+    candidate_indices = [i for i, cls in enumerate(object_classes) if cls == detected_class]
+
+    if len(candidate_indices) == 0:
+        return []
+
+    # Higher similarity threshold for image->image matches
+    SIM_THRESHOLD = 0.25
+
     scores = []
 
-    for i, emb in enumerate(object_embeddings):
-        emb = emb.reshape(-1)
+    for i in candidate_indices:
+        emb = object_embeddings[i].reshape(-1)
 
-        score = float(
-            np.dot(query_embedding, emb)
-        )
+        score = float(np.dot(query_embedding, emb))
 
-        if score > 0.15:
+        if score > SIM_THRESHOLD:
             scores.append((object_images[i], score))
 
     if len(scores) == 0:
         return []
 
-    scores.sort(
-        key=lambda x: x[1],
-        reverse=True
-    )
+    scores.sort(key=lambda x: x[1], reverse=True)
 
     return scores[:5]
 
